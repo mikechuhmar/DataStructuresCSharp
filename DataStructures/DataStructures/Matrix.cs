@@ -6,13 +6,27 @@ using System.Threading.Tasks;
 
 namespace DataStructures
 {
-    class Matrix
+    public class Matrix
     {
         // Элементы матрицы
         public double[,] elements;
         //Размерность матрицы
-        public int length;
-       
+        //public int length;
+        public int ColumnsCount
+        {
+            get
+            {
+                return elements.GetLength(0);
+            }
+        }
+        public int RowsCount
+        {
+            get
+            {
+                return elements.GetLength(1);
+            }
+        }
+        
         //Геттер и сеттер для элементов матрицы
         public double this[int i, int j]
         {
@@ -26,58 +40,77 @@ namespace DataStructures
             }
         }
         //Конструктор, принимающий двумерный массив элементов
-        public Matrix(double[,] _elements)
+        public Matrix(double[,] elements)
         {
-            length = (int)Math.Sqrt(_elements.Length);
-            elements = new double[length, length];
-            for (int i = 0; i < length; i++)
-                for (int j = 0; j < length; j++)
-                    elements[i, j] = _elements[i, j];
+            
+            this.elements = new double[elements.GetLength(0), elements.GetLength(1)];
+            for (int i = 0; i < elements.GetLength(0); i++)
+                for (int j = 0; j < elements.GetLength(1); j++)
+                    this.elements[i, j] = elements[i, j];
         }
         //Конструктор, не принимающий ничего
         public Matrix()
         {
 
         }
-        
+        public bool IsSameDimension(Matrix matrix)
+        {
+            return (RowsCount == matrix.RowsCount && ColumnsCount == ColumnsCount);
+        }
         public static Matrix operator +(Matrix a, Matrix b)
         {
-            double[,] elements = new double[a.length, a.length];
-            int i, j;
-            for (i = 0; i < a.length; i++)
+            
+            Matrix answ;
+            if (a.IsSameDimension(b))
             {
-
-                for (j = 0; j < a.length; j++)
+                double[,] elements = new double[a.RowsCount, a.ColumnsCount];
+                int i, j;
+                for (i = 0; i < a.RowsCount; i++)
                 {
-                    elements[i, j] = a[i, j] + b[i, j];
+
+                    for (j = 0; j < a.ColumnsCount; j++)
+                    {
+                        elements[i, j] = a[i, j] + b[i, j];
+                    }
                 }
+                answ = new Matrix(elements);
             }
-            Matrix answ = new Matrix(elements);
+            else
+                answ = null;
             return answ;
+
         }
+
         public static Matrix operator -(Matrix a, Matrix b)
         {
-            double[,] elements = new double[a.length, a.length];
-            int i, j;
-            for (i = 0; i < a.length; i++)
+          
+            Matrix answ;
+            if (a.IsSameDimension(b))
             {
-
-                for (j = 0; j < a.length; j++)
+                double[,] elements = new double[a.RowsCount, a.ColumnsCount];
+                int i, j;
+                for (i = 0; i < a.RowsCount; i++)
                 {
-                    elements[i, j] = a[i, j] - b[i, j];
+
+                    for (j = 0; j < a.ColumnsCount; j++)
+                    {
+                        elements[i, j] = a[i, j] - b[i, j];
+                    }
                 }
+                answ = new Matrix(elements);
             }
-            Matrix answ = new Matrix(elements);
+            else
+                answ = null;
             return answ;
         }
         public static Matrix operator -(Matrix m)
         {
-            double[,] elements = new double[m.length, m.length];
+            double[,] elements = new double[m.RowsCount, m.ColumnsCount];
             int i, j;
-            for (i = 0; i < m.length; i++)
+            for (i = 0; i < m.RowsCount; i++)
             {
 
-                for (j = 0; j < m.length; j++)
+                for (j = 0; j < m.ColumnsCount; j++)
                 {
                     elements[i, j] = -m[i, j];
                 }
@@ -87,11 +120,11 @@ namespace DataStructures
         }
         public static Matrix operator *(double alfa, Matrix m)
         {
-            double[,] elements = new double[m.length, m.length];
+            double[,] elements = new double[m.RowsCount, m.ColumnsCount];
             int i, j;
-            for (i = 0; i < m.length; i++)
+            for (i = 0; i < m.RowsCount; i++)
             {
-                for (j = 0; j < m.length; j++)
+                for (j = 0; j < m.ColumnsCount; j++)
                 {
                     elements[i, j] = alfa * m[i, j];
                 }
@@ -101,11 +134,11 @@ namespace DataStructures
         }
         public static Matrix operator *(Matrix m, double alfa)
         {
-            double[,] elements = new double[m.length, m.length];
+            double[,] elements = new double[m.RowsCount, m.ColumnsCount];
             int i, j;
-            for (i = 0; i < m.length; i++)
+            for (i = 0; i < m.RowsCount; i++)
             {
-                for (j = 0; j < m.length; j++)
+                for (j = 0; j < m.ColumnsCount; j++)
                 {
                     elements[i, j] = alfa * m[i, j];
                 }
@@ -115,11 +148,11 @@ namespace DataStructures
         }
         public static Matrix operator /(Matrix m, double alfa)
         {
-            double[,] elements = new double[m.length, m.length];
+            double[,] elements = new double[m.RowsCount, m.ColumnsCount];
             int i, j;
-            for (i = 0; i < m.length; i++)
+            for (i = 0; i < m.RowsCount; i++)
             {
-                for (j = 0; j < m.length; j++)
+                for (j = 0; j < m.ColumnsCount; j++)
                 {
                     elements[i, j] = m[i, j] / alfa;
                 }
@@ -129,31 +162,33 @@ namespace DataStructures
         }
         public static Matrix operator *(Matrix a, Matrix b)
         {
-            double[,] elements = new double[a.length, a.length];
-            int i, j;
-            for (i = 0; i < a.length; i++)
+            Matrix answ;
+            if (a.IsSameDimension(b))
             {
-
-                for (j = 0; j < a.length; j++)
+                double[,] elements = new double[a.RowsCount, a.ColumnsCount];
+                int i, j;
+                for (i = 0; i < a.RowsCount; i++)
                 {
-                    elements[i, j] = 0;
-                    for (int k = 0; k < a.length; k++)
+
+                    for (j = 0; j < a.ColumnsCount; j++)
                     {
-                        elements[i, j] += a[i, k] * b[k, j];
+                        elements[i, j] = a[i, j] * b[i, j];
                     }
                 }
+                answ = new Matrix(elements);
             }
-            Matrix answ = new Matrix(elements);
+            else
+                answ = null;
             return answ;
         }
         //Транспонированная матрица
         public static Matrix transp(Matrix m)
         {
-            double[,] elements = new double[m.length, m.length];
+            double[,] elements = new double[m.RowsCount, m.ColumnsCount];
             int i, j;
-            for (i = 0; i < m.length; i++)
+            for (i = 0; i < m.RowsCount; i++)
             {
-                for (j = 0; j < m.length; j++)
+                for (j = 0; j < m.ColumnsCount; j++)
                 {
                     elements[i, j] = m[j, i];
                 }
@@ -161,106 +196,16 @@ namespace DataStructures
             Matrix answ = new Matrix(elements);
             return answ;
         }
-        public Matrix Transp
+        public virtual Matrix Transp
         {
             get
             {
                 return transp(this);
             }
         }
-        //Минор при заданных столбце и строчке
-        public static Matrix minor(Matrix matr, int a, int b)
-        {
-            int m = matr.length;
-            double[,] answ = new double[m - 1, m - 1];
-            int di = 0, dj;
-            for (int i = 0; i < m - 1; i++)
-            {
-                if (i == a)
-                    di = 1;
-                dj = 0;
-                for (int j = 0; j < m - 1; j++)
-                {
-                    if (j == b)
-                        dj = 1;
-                    answ[i, j] = matr[i + di, j + dj];
-                }
-            }
-            return new Matrix(answ);
-        }
-        public Matrix Minor(int a, int b)
-        {
-            return minor(this, a, b);
-        }
-        //Определитель матрицы
-        public static double det(Matrix matr)
-        {
-            int m = matr.length;
-            double[,] p = new double[m, m];
-            double answ = 0;
-            int k = 1;
-            int n = m - 1;
-            if (m == 1)
-            {
-                answ = matr[0, 0];
-                return answ;
-            }
-            if (m == 2)
-            {
-                answ = matr[0, 0] * matr[1, 1] - matr[1, 0] * matr[0, 1];
-            }
-            if (m > 2)
-            {
-                for (int i = 0; i < m; i++)
-                {
-                    Console.WriteLine(i);
-                    Matrix minor = matr.Minor(i, 0);
-                    //Console.WriteLine(matr[i,0]);
-                    //minor.output();
-                    answ += k * matr[i, 0] * det(minor);
-
-                    k = -k;
-                }
-            }
-            return answ;
-        }
-        public double Det
-        {
-            get
-            {
-                return det(this);
-            }
-        }
-        //Союзная матрица
-        public static Matrix alliedMatrix(Matrix matr)
-        {
-
-            int m = matr.length;
-            double[,] answ = new double[m, m];
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < m; j++)
-                    answ[i, j] = Math.Pow(-1, i + j) * matr.Minor(i, j).Det;
-            return new Matrix(answ);
-        }
-        public Matrix AlliedMatrix
-        {
-            get
-            {
-                return alliedMatrix(this);
-            }
-        }
-        //Обратная матрица
-        public static Matrix inverseMatrix(Matrix matr)
-        {
-            if (matr.Det == 0)
-                Console.WriteLine("нет");
-            Matrix answ = matr.AlliedMatrix.Transp / matr.Det;
-            return answ;
-        }
-        public Matrix InverseMatrix
-        {
-            get { return inverseMatrix(this); }
-        }
+        
+        
+        
         /*public static Matrix inverseMatrixGJ(Matrix matr)
         {
             if (matr.Det == 0)
@@ -272,9 +217,9 @@ namespace DataStructures
         //Вывод в консоль
         public void output()
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < RowsCount; i++)
             {
-                for (int j = 0; j < length; j++)
+                for (int j = 0; j < ColumnsCount; j++)
                 {
                     Console.Write("{0}  ", elements[i, j]);
                 }
