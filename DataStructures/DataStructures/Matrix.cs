@@ -196,7 +196,7 @@ namespace DataStructures
             Matrix answ = new Matrix(elements);
             return answ;
         }
-        public virtual Matrix Transp
+        public Matrix Transp
         {
             get
             {
