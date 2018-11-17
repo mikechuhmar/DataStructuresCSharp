@@ -89,14 +89,14 @@ namespace DataStructures
                 }
             }
 
-            if (WeightMatrix[currentVertex, startVertex] > 0)   //Если есть путь из конца к началу (цикл)
+            if (WeightMatrix[currentVertex, startVertex] > 0)   
             {
-                result.Add(startVertex);         //Добавляем стартовую точку
+                result.Add(startVertex);        
                 return result;
             }
             else
             {
-                return null;    //Иначе - не цикл
+                return null;    
             }
         }
         //Индекс ближайшего соседа
