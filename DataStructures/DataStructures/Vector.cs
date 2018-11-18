@@ -41,6 +41,10 @@ namespace DataStructures
         {
             elements = new List<double>();
         }
+        public Vector(int amount)
+        {
+            elements = new List<double>(amount);
+        }
         public Vector(Vector vector, double d)
         {
             elements = new List<double>();
@@ -92,6 +96,26 @@ namespace DataStructures
         {
             return elements.Sum();
         }
+        //Прегрузки операторов
+        public static Vector operator +(Vector a, Vector b)
+        {
+            Vector answ = new Vector(a);
+            for (int i = 0; i < a.Count; i++)
+            {
+                answ[i] = a[i] + b[i];
+            }
+            return answ;
+        }
+        public static Vector operator -(Vector a, Vector b)
+        {
+            Vector answ = new Vector(a);
+            for (int i = 0; i < a.Count; i++)
+            {
+                answ[i] = a[i] - b[i];
+            }
+            return answ;
+        }
+        
         public bool IsEquivalent(Vector vector)
         {
             bool var = true;
