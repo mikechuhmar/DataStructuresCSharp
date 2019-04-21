@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataStructures
+﻿namespace DataStructures
 {
     public class Graf
     {
@@ -39,8 +33,6 @@ namespace DataStructures
         }
         public Graf(SquareMatrix squareMatrix)
         {
-            //Graf(squareMatrix.elements);
-            //WeightMatrix = new SquareMatrix(squareMatrix.elements);
             double[,] elements = squareMatrix.elements;
             double[,] new_elements = new double[elements.GetLength(0), elements.GetLength(1)];
             for (int i = 0; i < elements.GetLength(0); i++)
@@ -70,7 +62,7 @@ namespace DataStructures
         }
         public static string OutVertex(int index)
         {
-            string leters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string leters = "ABCDFGHIJKLMNOPQRSTUVWXYZ";
             return leters[index].ToString();
 
 
