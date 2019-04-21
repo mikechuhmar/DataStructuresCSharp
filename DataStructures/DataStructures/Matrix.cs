@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataStructures
 {
@@ -10,8 +6,6 @@ namespace DataStructures
     {
         // Элементы матрицы
         public double[,] elements;
-        //Размерность матрицы
-        //public int length;
         public int ColumnsCount
         {
             get
@@ -204,16 +198,6 @@ namespace DataStructures
             }
         }
         
-        
-        
-        /*public static Matrix inverseMatrixGJ(Matrix matr)
-        {
-            if (matr.Det == 0)
-                Console.WriteLine("нет");
-            Matrix answ = Matrix.E(matr.length);
-            
-
-        }*/
         //Вывод в консоль
         public void output()
         {
