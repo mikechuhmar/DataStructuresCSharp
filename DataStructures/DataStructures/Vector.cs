@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataStructures
 {
@@ -78,10 +75,11 @@ namespace DataStructures
             string str = "";
             foreach (var element in elements)
             {
-                str += element.ToString() + " ";
+                str += (element - element % 0.001).ToString() + "    ";
             }
             return str;
         }
+        
         public Vector InnerProduct(Vector vector)
         {
             List<double> answerElements = new List<double>(vector.Count);
