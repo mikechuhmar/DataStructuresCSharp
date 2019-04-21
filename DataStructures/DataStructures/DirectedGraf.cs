@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataStructures
 {
@@ -62,42 +60,47 @@ namespace DataStructures
             }
             return length;
         }
-
-        public List<int> FindCycle(int startVertex)
+        int NeighborIndex(int index, List<int> addedIndexes)
+        {
+            double min = double.MaxValue;
+            int indexOfMin = int.MaxValue;
+            for (int i = 0; i < NodesCount; i++)
+            {
+                if (i != index && !addedIndexes.Contains(i) /*&& WeightMatrix[index, i] < min*/ && WeightMatrix[index, i] > 0 && indexOfMin == int.MaxValue)
+                {
+                    min = WeightMatrix[index, i];
+                    indexOfMin = i;
+                }
+            }
+            return indexOfMin;
+        }
+        public List<int> FindWay(int index)
         {
 
 
-            List<int> result = new List<int>();
-            result.Add(startVertex);
-            int currentVertex = startVertex, nextVertex = -1;
-            for (int i = 1; i < NodesCount; i++)
+            List<int> indexes = new List<int>();
+            indexes.Add(index);
+            int currentIndex = index;
+            while (indexes.Count < NodesCount)
             {
-                for (int j = 0; j < NodesCount; j++)
-                    if (WeightMatrix[currentVertex, j] > 0 && !result.Contains(j) && nextVertex < 0)
-                    {
-                        nextVertex = j;
-                    }
-                if (nextVertex >= 0)
-                {
-                    currentVertex = nextVertex;
-                    result.Add(currentVertex);
-                    nextVertex = -1;
-                }
-                else
-                {
+                currentIndex = NeighborIndex(currentIndex, indexes);
+                if (currentIndex == int.MaxValue)
                     return null;
-                }
-            }
+                indexes.Add(currentIndex);
 
-            if (WeightMatrix[currentVertex, startVertex] > 0)   
+
+            }
+            if (indexes.Count == NodesCount && WeightMatrix[currentIndex, index] > 0)
             {
-                result.Add(startVertex);        
-                return result;
+                indexes.Add(index);
+
             }
             else
             {
-                return null;    
+                return null;
             }
+
+            return indexes;
         }
         //Индекс ближайшего соседа
         int NearestNeighborIndex(int index, List<int> addedIndexes)
@@ -181,7 +184,6 @@ namespace DataStructures
             }
             do
             {
-                //Console.WriteLine("Find");
                 do
                 {
                     rnd1 = random.Next(0, prevCycle.Count - 1);
@@ -201,15 +203,10 @@ namespace DataStructures
                 string s = "";
                 foreach (var v in resultCycle)
                     s += v.ToString();
-                //Console.WriteLine(s);
 
             } while (LengthCycle(resultCycle) == 0);
             
             return resultCycle;
-            //if (EnergyHaving(result))
-            //    return result;
-            //else
-            //    return null;
         }
         bool canTransit(double d, double T)
         {
@@ -228,6 +225,7 @@ namespace DataStructures
             double energy;
             for (int i = 0; i < NodesCount && result == null; i++)
             {
+                //result = FindWay(i);
                 result = NearestNeighborAlgorithm(i);
             }
             if(result != null)
@@ -251,11 +249,128 @@ namespace DataStructures
                 Temperature *= alfa;
                 Console.WriteLine(Temperature.ToString());
             } while (Temperature > minTemperature);
-            //result = NewWayAnnealing(result);
+            return result;
+
+        }
+
+        double AntWayProbability(int index1, int index2, List<int> tabuListIndexes, List<List<double>> intensityList, double alfa, double beta)
+        {
+            if (WeightMatrix[index1, index2] <= 0 || tabuListIndexes.Contains(index2))
+                return -1;
+            else
+            {
+                double sum = 0;
+                for (int j = 0; j < NodesCount; j++)
+                {
+                    if (!tabuListIndexes.Contains(j) && WeightMatrix[index1, j] > 0)
+                        sum += Math.Pow(WeightMatrix[index1, j], alfa) / Math.Pow(intensityList[index1][j], beta);
+                }
+                return Math.Pow(WeightMatrix[index1, index2], alfa) / Math.Pow(intensityList[index1][index2], beta) / sum;
+            }
+        }
+        int AntNeighbor(int index, List<int> tabuListIndexes, List<List<double>> intensityList, double alfa, double beta)
+        {
+            Random random = new Random();
+            List<double> P_list = new List<double>();
+            List<Probability> probabilities = new List<Probability>();
+            List<Interval> intervals = new List<Interval>();
+            int result = int.MaxValue;
+            for(int i = 0; i < NodesCount; i++)
+            {
+                double P = AntWayProbability(index, i, tabuListIndexes, intensityList, alfa, beta);
+                if (P != -1)
+                    probabilities.Add(new Probability(i, P));
+            }
+            if (probabilities.Count == 0)
+                return result;
+            intervals.Add(new Interval(probabilities[0].index, 0, probabilities[0].P));
+            if (probabilities.Count>1)
+            {
+                for (int i = 1; i < probabilities.Count; i++)
+                {
+                    Interval interval = new Interval(probabilities[i].index, intervals[i - 1].b, intervals[i - 1].b + probabilities[i].P);
+                    intervals.Add(interval);
+                }
+            }
+            double randP = random.NextDouble();
+            for (int i = 0; i < intervals.Count && result == int.MaxValue; i++)
+            {
+                if (intervals[i].Contains(randP))
+                {
+                    result = intervals[i].index;
+                }
+            }
+            return result;
+        }
+        List<int> AntWay(int index, List<List<double>> intensityList, double alfa, double beta)
+        {
+            int currentIndex = index;
+            List<int> tabuListIndexes = new List<int>();
+            tabuListIndexes.Add(currentIndex);
+            while (tabuListIndexes.Count < NodesCount)
+            {
+                currentIndex = AntNeighbor(currentIndex, tabuListIndexes, intensityList, alfa, beta);
+                if (currentIndex == int.MaxValue)
+                    return null;
+                tabuListIndexes.Add(currentIndex);
+            }
+            if (WeightMatrix[currentIndex, index] > 0)
+                tabuListIndexes.Add(index);
+            else
+                return null;
+            return tabuListIndexes;
+            
+
+        }
+        public List<int> AntAlgorithm(int N, double alfa, double beta)
+        {
+            Random random = new Random();
+            List<int> currentWay = null, result = null;
+            List<int> tabuListIndexes = new List<int>();
+            List<List<double>> intensityList = new List<List<double>>();
+            double /*alfa = 0.5, beta = 0.05, */e = 0.05, k = 0.5;
+            for (int i = 0; i < NodesCount; i++)
+            {
+                intensityList.Add(new List<double>());
+                for (int j = 0; j < NodesCount; j++)
+                {
+                    if (WeightMatrix[i, j] > 0)
+                        intensityList[i].Add(1);
+                    else
+                        intensityList[i].Add(-1);
+                }
+            }
+            for (int i = 0; i < NodesCount && result == null; i++)
+            {
+                result = FindWay(i);
+            }
+            if (result == null)
+                return result;
+            Console.WriteLine(Cycle(result));
+
+            for (int i = 0; i < result.Count - 1; i++)
+            {
+                int index1 = result[i];
+                int index2 = result[i + 1];
+                intensityList[index1][index2] = (1 - e) * intensityList[index1][index2] + k / WeightMatrix[index1, index2];
+            }
+            for (int i = 1; i < N; i++)
+            {
+                int index = random.Next(0, NodesCount);
+                Console.WriteLine(index.ToString());
+                currentWay = AntWay(index, intensityList, alfa, beta);
+                if (currentWay != null)
+                {
+                    if (LengthCycle(currentWay) < LengthCycle(result))
+                        result = currentWay;
+                }
+                Console.WriteLine(Cycle(result));
+            }
+
+            
 
             return result;
 
         }
-        
     }
 }
